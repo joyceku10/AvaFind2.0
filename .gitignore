@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local dev database
+backend/avafind.db
+
+# Frontend
+frontend/node_modules/
+backend/static/
+
+# Real deployment parameters (contain SQL password + your IP) — only the
+# .example file is committed
+infra/main.parameters.json
+
+# Deploy artifact
+backend.zip

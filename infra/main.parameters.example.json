@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": { "value": "rg-avafind" },
+    "createResourceGroup": { "value": true },
+    "location": { "value": "eastus2" },
+    "namePrefix": { "value": "avafind" },
+    "appServiceSku": { "value": "B1" },
+    "sqlDatabaseSku": { "value": "Basic" },
+    "sqlAdminLogin": { "value": "avafindadmin" },
+    "sqlAdminPassword": { "value": "<set-a-strong-password>" },
+    "allowedClientIp": { "value": "<your.public.ip.here>" }
+  }
+}
