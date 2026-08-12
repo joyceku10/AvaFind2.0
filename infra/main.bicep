@@ -33,8 +33,8 @@ param sqlAdminLogin string = 'avafindadmin'
 @description('SQL admin password.')
 param sqlAdminPassword string
 
-@description('The ONLY public IP allowed to reach the app (v1 has no auth; network restriction is the access control). Update and redeploy when your IP changes.')
-param allowedClientIp string
+@description('Public IPs allowed to reach the app (v1 has no auth; network restriction is the access control). Update and redeploy when your IP changes.')
+param allowedClientIps array
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = if (createResourceGroup) {
   name: resourceGroupName
@@ -51,7 +51,7 @@ module stack 'resources.bicep' = {
     sqlDatabaseSku: sqlDatabaseSku
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
-    allowedClientIp: allowedClientIp
+    allowedClientIps: allowedClientIps
   }
   dependsOn: [rg]
 }

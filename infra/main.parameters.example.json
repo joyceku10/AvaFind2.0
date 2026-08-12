@@ -10,6 +10,11 @@
     "sqlDatabaseSku": { "value": "Basic" },
     "sqlAdminLogin": { "value": "avafindadmin" },
     "sqlAdminPassword": { "value": "<set-a-strong-password>" },
-    "allowedClientIp": { "value": "<your.public.ip.here>" }
+    "allowedClientIps": {
+      "value": [
+        "<your.public.ip.here>",
+        "<second.public.ip.here>"
+      ]
+    }
   }
 }

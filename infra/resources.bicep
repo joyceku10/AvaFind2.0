@@ -9,7 +9,7 @@ param sqlDatabaseSku string
 param sqlAdminLogin string
 @secure()
 param sqlAdminPassword string
-param allowedClientIp string
+param allowedClientIps array
 
 var suffix = uniqueString(resourceGroup().id)
 var webAppName = '${namePrefix}-${suffix}'
@@ -40,18 +40,16 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState: 'Disabled'
       alwaysOn: appServiceSku != 'F1'
       // v1 access control: no auth in the app, so the App Service itself is
-      // closed to everything except the single allowed IP. Change the
-      // allowedClientIp parameter and redeploy to update.
+      // closed to everything except the allowed IP list. Change the
+      // allowedClientIps parameter and redeploy to update.
       ipSecurityRestrictionsDefaultAction: 'Deny'
-      ipSecurityRestrictions: [
-        {
-          name: 'allow-client-ip'
-          action: 'Allow'
-          priority: 100
-          ipAddress: '${allowedClientIp}/32'
-          description: 'Only allowed viewer of the prototype'
-        }
-      ]
+      ipSecurityRestrictions: [for (ip, i) in allowedClientIps: {
+        name: 'allow-client-ip-${i + 1}'
+        action: 'Allow'
+        priority: 100 + i
+        ipAddress: '${ip}/32'
+        description: 'Allowed viewer/deployer IP ${i + 1}'
+      }]
       // Deployment (Kudu/SCM) endpoint gets the same single-IP restriction,
       // so deploys must come from the allowed IP too.
       scmIpSecurityRestrictionsUseMain: true
@@ -100,15 +98,15 @@ resource fwAzure 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = {
   }
 }
 
-// Let the allowed client IP run the import script locally against Azure SQL.
-resource fwClient 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = {
+// Let allowed client IPs run the import script locally against Azure SQL.
+resource fwClients 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = [for (ip, i) in allowedClientIps: {
   parent: sqlServer
-  name: 'AllowClientIp'
+  name: 'AllowClientIp${i + 1}'
   properties: {
-    startIpAddress: allowedClientIp
-    endIpAddress: allowedClientIp
+    startIpAddress: ip
+    endIpAddress: ip
   }
-}
+}]
 
 output webAppName string = webApp.name
 output webAppUrl string = 'https://${webApp.properties.defaultHostName}'
