@@ -2,8 +2,10 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 using AvaFind.Data;
+using AvaFind.Contracts;
 
 namespace backend_dotnet;
 
@@ -23,25 +25,20 @@ public class GetMeta
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-        ImportMeta? meta = await _database.ImportMetadata.FindAsync(1);
+        ImportMeta? meta = await _database.ImportMetadata.AsNoTracking().FirstOrDefaultAsync();
 
         if (meta is null)
         {
-            return new OkObjectResult(new
-            {
-                extract_date = (DateOnly?)null,
-                imported_at = (DateTime?)null,
-                row_count = 0,
-                source_file = (string?)null
-            });
+            return new OkObjectResult(
+                new MetaResponse(null, null, 0, null)
+            );
         }
 
-        return new OkObjectResult(new
-        {
-            extract_date = meta.ExtractDate,
-            imported_at = meta.ImportedAt,
-            row_count = meta.RowCount,
-            source_file = meta.SourceFile
-        });
+        return new OkObjectResult(new MetaResponse(
+            meta.ExtractDate,
+            meta.ImportedAt,
+            meta.RowCount,
+            meta.SourceFile
+        ));
     }
 }
