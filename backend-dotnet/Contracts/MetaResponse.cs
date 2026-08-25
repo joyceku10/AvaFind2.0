@@ -13,4 +13,5 @@ public sealed record MetaResponse(
     int RowCount,
 
     [property: JsonPropertyName("source_file")]
-    string? SourceFile);
+    string? SourceFile
+);

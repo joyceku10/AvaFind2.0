@@ -11,21 +11,18 @@ namespace backend_dotnet;
 
 public class GetMeta
 {
-    private readonly ILogger<GetMeta> _logger;
     private readonly AvaFindDbContext _database;
 
-    public GetMeta(ILogger<GetMeta> logger, AvaFindDbContext database)
+    public GetMeta(AvaFindDbContext database)
     {
-        _logger = logger;
         _database = database;
     }
 
     [Function("GetMeta")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "meta")] HttpRequest req)
     {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-        ImportMeta? meta = await _database.ImportMetadata.AsNoTracking().FirstOrDefaultAsync();
+        ImportMeta? meta = await _database.ImportMetadata.SingleOrDefaultAsync();
 
         if (meta is null)
         {
